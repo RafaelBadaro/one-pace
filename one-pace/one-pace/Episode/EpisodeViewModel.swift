@@ -13,4 +13,5 @@ class EpisodeViewModel {
     init(episode: Episode? = nil) {
         self.episode = episode
     }
+    
 }

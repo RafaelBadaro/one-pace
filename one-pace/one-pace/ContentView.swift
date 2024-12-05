@@ -7,59 +7,91 @@
 
 import SwiftUI
 import SwiftData
+import AVFoundation
+import AVKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
+    
+    @StateObject private var viewModel = VideoListViewModel()
 
     var body: some View {
-        
-        EpisodeView()
-        
-//        NavigationSplitView {
-//            List {
-//                ForEach(items) { item in
-//                    NavigationLink {
-//                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-//                    } label: {
-//                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-//                    }
-//                }
-//                .onDelete(perform: deleteItems)
-//            }
-//#if os(macOS)
-//            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-//#endif
-//            .toolbar {
-//#if os(iOS)
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    EditButton()
-//                }
-//#endif
-//                ToolbarItem {
-//                    Button(action: addItem) {
-//                        Label("Add Item", systemImage: "plus")
-//                    }
-//                }
-//            }
-//        } detail: {
-//            Text("Select an item")
-//        }
-    }
+        NavigationView {
+            VStack {
+                Text("Vídeos do Carrossel")
+                    .font(.headline)
+                    .padding()
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+                if viewModel.isLoading {
+                    ProgressView("Carregando vídeos...")
+                } else if let errorMessage = viewModel.errorMessage {
+                    Text("Erro: \(errorMessage)")
+                        .foregroundColor(.red)
+                        .padding()
+                } else {
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            ForEach(viewModel.videoURLs, id: \.self) { url in
+                                VideoThumbnailView(videoURL: url)
+                                    .frame(height: 200)
+                                    .cornerRadius(10)
+                                    .shadow(radius: 5)
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+            .navigationTitle("Carrossel de Vídeos")
+        }
+        .onAppear {
+            viewModel.fetchVideos()
+        }
+    }
+}
+
+
+struct VideoThumbnailView: View {
+    let videoURL: URL
+
+    var body: some View {
+        ZStack {
+            VideoPlayerView(videoURL: videoURL)
+            Color.black.opacity(0.3) // Sobreposição
+                .onTapGesture {
+                    playVideo(url: videoURL)
+                }
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+    func playVideo(url: URL) {
+        let player = AVPlayer(url: url)
+        let playerViewController = AVPlayerViewController()
+        playerViewController.player = player
+
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first,
+           let rootViewController = window.rootViewController {
+            rootViewController.present(playerViewController, animated: true) {
+                player.play()
             }
         }
+    }
+}
+
+struct VideoPlayerView: UIViewControllerRepresentable {
+    let videoURL: URL
+
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let playerViewController = AVPlayerViewController()
+        playerViewController.player = AVPlayer(url: videoURL)
+        playerViewController.showsPlaybackControls = false
+        return playerViewController
+    }
+
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+        // Sem atualizações necessárias
     }
 }
 

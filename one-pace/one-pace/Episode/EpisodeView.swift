@@ -11,8 +11,13 @@ struct EpisodeView: View {
     
     @State private var episodeViewModel = EpisodeViewModel()
     
+    let url = "https://pixeldrain.com/api/file/PZ2RNRUW"
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VideoPlayerView(videoURL: URL(string: url)!)
+            .frame(height: 300)
+            .cornerRadius(10)
+            .padding()
     }
 }
 
