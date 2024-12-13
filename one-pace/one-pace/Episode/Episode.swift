@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class Episode {
+final class Episode  {
     /**
         Exemplo de URL com o Whole cake island
      

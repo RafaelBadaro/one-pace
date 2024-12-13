@@ -14,39 +14,25 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
-    @StateObject private var viewModel = VideoListViewModel()
-
+    //TODO: criar isso na mao ou descobrir um jeito legal
+    let arcs: [Arc] = [
+        Arc(id: "", name: "Dressrosa"),
+        Arc(id: "5pVTECas", name: "Whole Cake Island")
+    ]
+    
     var body: some View {
-        NavigationView {
-            VStack {
-                Text("Vídeos do Carrossel")
-                    .font(.headline)
-                    .padding()
-
-                if viewModel.isLoading {
-                    ProgressView("Carregando vídeos...")
-                } else if let errorMessage = viewModel.errorMessage {
-                    Text("Erro: \(errorMessage)")
-                        .foregroundColor(.red)
-                        .padding()
-                } else {
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            ForEach(viewModel.videoURLs, id: \.self) { url in
-                                VideoThumbnailView(videoURL: url)
-                                    .frame(height: 200)
-                                    .cornerRadius(10)
-                                    .shadow(radius: 5)
-                            }
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    ForEach(arcs) { currentArc in
+                        NavigationLink(destination: ArcView(viewModel: ArcViewModel(arc: currentArc))) {
+                            Text(currentArc.name)
                         }
-                        .padding()
                     }
                 }
+                .padding()
             }
-            .navigationTitle("Carrossel de Vídeos")
-        }
-        .onAppear {
-            viewModel.fetchVideos()
+            .navigationTitle("Arcs")
         }
     }
 }
@@ -54,22 +40,22 @@ struct ContentView: View {
 
 struct VideoThumbnailView: View {
     let videoURL: URL
-
+    
     var body: some View {
         ZStack {
             VideoPlayerView(videoURL: videoURL)
-            Color.black.opacity(0.3) // Sobreposição
+            Color.black.opacity(0.3)
                 .onTapGesture {
                     playVideo(url: videoURL)
                 }
         }
     }
-
+    
     func playVideo(url: URL) {
         let player = AVPlayer(url: url)
         let playerViewController = AVPlayerViewController()
         playerViewController.player = player
-
+        
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first,
            let rootViewController = window.rootViewController {
@@ -82,14 +68,14 @@ struct VideoThumbnailView: View {
 
 struct VideoPlayerView: UIViewControllerRepresentable {
     let videoURL: URL
-
+    
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let playerViewController = AVPlayerViewController()
         playerViewController.player = AVPlayer(url: videoURL)
         playerViewController.showsPlaybackControls = false
         return playerViewController
     }
-
+    
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
         // Sem atualizações necessárias
     }
