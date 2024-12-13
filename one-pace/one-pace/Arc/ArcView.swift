@@ -40,9 +40,14 @@ struct ArcView: View {
         }
         .navigationTitle(viewModel.arc.name)
         .onAppear {
-            Task {
-                await viewModel.fetchEpisodes()
+            if viewModel.arc.episodes.isEmpty {
+                Task {
+                    await viewModel.fetchEpisodes()
+                }
+            } else {
+                print("Ja fiz o fetch")
             }
+
         }
     }
 }

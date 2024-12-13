@@ -7,8 +7,6 @@
 
 import SwiftUI
 import SwiftData
-import AVFoundation
-import AVKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
@@ -37,49 +35,6 @@ struct ContentView: View {
     }
 }
 
-
-struct VideoThumbnailView: View {
-    let videoURL: URL
-    
-    var body: some View {
-        ZStack {
-            VideoPlayerView(videoURL: videoURL)
-            Color.black.opacity(0.3)
-                .onTapGesture {
-                    playVideo(url: videoURL)
-                }
-        }
-    }
-    
-    func playVideo(url: URL) {
-        let player = AVPlayer(url: url)
-        let playerViewController = AVPlayerViewController()
-        playerViewController.player = player
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first,
-           let rootViewController = window.rootViewController {
-            rootViewController.present(playerViewController, animated: true) {
-                player.play()
-            }
-        }
-    }
-}
-
-struct VideoPlayerView: UIViewControllerRepresentable {
-    let videoURL: URL
-    
-    func makeUIViewController(context: Context) -> AVPlayerViewController {
-        let playerViewController = AVPlayerViewController()
-        playerViewController.player = AVPlayer(url: videoURL)
-        playerViewController.showsPlaybackControls = false
-        return playerViewController
-    }
-    
-    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
-        // Sem atualizações necessárias
-    }
-}
 
 #Preview {
     ContentView()

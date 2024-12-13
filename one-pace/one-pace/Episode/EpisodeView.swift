@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVKit
 
 struct EpisodeView: View {
     @ObservedObject private var viewModel: EpisodeViewModel
@@ -14,17 +15,43 @@ struct EpisodeView: View {
         self.viewModel = viewModel
     }
     
-//    @State private var episodeViewModel = EpisodeViewModel()
-//    
-//    let url = "https://pixeldrain.com/api/file/PZ2RNRUW"
-    
     var body: some View {
         NavigationStack {
-            Text(viewModel.episode.name)
-            Text(viewModel.episode.url)
+            ZStack {
+                Color.blue.opacity(0.3)
+                if let url = URL(string: viewModel.episode.url) {
+                    VideoPlayerView(url: url)
+                        .frame(height: 300)
+                        .cornerRadius(10)
+                        .padding()
+                } else {
+                    Text("URL inválida")
+                        .foregroundColor(.red)
+                }
+            }
         }
         .navigationTitle(viewModel.episode.name)
+    }
+}
 
+// Representa o AVPlayerViewController no SwiftUI
+struct VideoPlayerView: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let playerViewController = AVPlayerViewController()
+        let player = AVPlayer(url: url)
+        
+        playerViewController.player = player
+        playerViewController.showsPlaybackControls = true // Controles de reprodução
+        player.automaticallyWaitsToMinimizeStalling = true // Reduz travamentos
+        player.volume = 1.0 // Garante que o som está no máximo
+        
+        return playerViewController
+    }
+    
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+        // Atualize se necessário
     }
 }
 
