@@ -8,19 +8,26 @@
 import SwiftUI
 
 struct EpisodeView: View {
+    @ObservedObject private var viewModel: EpisodeViewModel
     
-    @State private var episodeViewModel = EpisodeViewModel()
+    init(viewModel: EpisodeViewModel) {
+        self.viewModel = viewModel
+    }
     
-    let url = "https://pixeldrain.com/api/file/PZ2RNRUW"
+//    @State private var episodeViewModel = EpisodeViewModel()
+//    
+//    let url = "https://pixeldrain.com/api/file/PZ2RNRUW"
     
     var body: some View {
-        VideoPlayerView(videoURL: URL(string: url)!)
-            .frame(height: 300)
-            .cornerRadius(10)
-            .padding()
+        NavigationStack {
+            Text(viewModel.episode.name)
+            Text(viewModel.episode.url)
+        }
+        .navigationTitle(viewModel.episode.name)
+
     }
 }
 
-#Preview {
-    EpisodeView()
-}
+//#Preview {
+//    EpisodeView()
+//}

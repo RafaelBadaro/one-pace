@@ -7,10 +7,13 @@
 
 import Foundation
 
-class EpisodeViewModel {
-    @Published var episode: Episode?
-    
-    init(episode: Episode? = nil) {
+class EpisodeViewModel : ObservableObject {
+    private let api = PixelDrainAPI()
+    @Published var episode: EpisodeTest
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+ 
+    init(episode: EpisodeTest) {
         self.episode = episode
     }
     

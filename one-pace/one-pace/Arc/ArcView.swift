@@ -26,8 +26,11 @@ struct ArcView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 20) {
-                            ForEach(viewModel.arc.episodes) { episode in
-                                Text("\(episode.name)")
+                            ForEach(viewModel.arc.episodes) { currentEpisode in
+                                NavigationLink(destination:
+                                                EpisodeView(viewModel: EpisodeViewModel(episode: currentEpisode))) {
+                                    Text(currentEpisode.name)
+                                }
                             }
                         }
                         .padding()
