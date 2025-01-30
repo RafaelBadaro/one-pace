@@ -30,7 +30,7 @@ struct EpisodeView: View {
                 }
             }
         }
-        .navigationTitle(viewModel.episode.name)
+        .navigationTitle(viewModel.episode.onePaceEpisodeName)
     }
 }
 

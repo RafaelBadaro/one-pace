@@ -28,7 +28,7 @@ class ArcViewModel : ObservableObject {
             let episodes = response.files.map { pixelDrainVideo in
                 return EpisodeTest(
                     id: pixelDrainVideo.id,
-                    name: pixelDrainVideo.name,
+                    pixelDrainName: pixelDrainVideo.name,
                     url: "https://pixeldrain.com/api/file/\(pixelDrainVideo.id)"
                 )
             }

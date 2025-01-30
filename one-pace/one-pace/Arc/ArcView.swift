@@ -15,39 +15,46 @@ struct ArcView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 if viewModel.isLoading {
                     ProgressView("Carregando vídeos...")
+                        .padding()
                 } else if let errorMessage = viewModel.errorMessage {
                     Text("Erro: \(errorMessage)")
                         .foregroundColor(.red)
                         .padding()
                 } else {
                     ScrollView {
-                        VStack(spacing: 20) {
-                            ForEach(viewModel.arc.episodes) { currentEpisode in
-                                NavigationLink(destination:
-                                                EpisodeView(viewModel: EpisodeViewModel(episode: currentEpisode))) {
-                                    Text(currentEpisode.name)
+                        ForEach(viewModel.arc.episodes, id: \.id) { currentEpisode in
+                            NavigationLink(destination:
+                                            EpisodeView(viewModel: EpisodeViewModel(episode: currentEpisode))) {
+                                
+                                VStack(alignment: .leading) {
+                                    Text(currentEpisode.onePaceEpisodeName)
+                                        .font(.title)
+                                    Text("One piece eps: \(currentEpisode.onePieceEpisodes)")
+                                        .font(.subheadline)
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(.thinMaterial)
+                                
                             }
                         }
-                        .padding()
+                    }
+                    .navigationTitle(viewModel.arc.name)
+                    .onAppear {
+                        if viewModel.arc.episodes.isEmpty {
+                            Task {
+                                await viewModel.fetchEpisodes()
+                            }
+                        } else {
+                            print("Já fiz o fetch")
+                        }
                     }
                 }
             }
-        }
-        .navigationTitle(viewModel.arc.name)
-        .onAppear {
-            if viewModel.arc.episodes.isEmpty {
-                Task {
-                    await viewModel.fetchEpisodes()
-                }
-            } else {
-                print("Ja fiz o fetch")
-            }
-
         }
     }
 }

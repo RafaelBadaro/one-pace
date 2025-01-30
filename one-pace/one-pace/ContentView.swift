@@ -16,8 +16,6 @@ struct ContentView: View {
         
     var body: some View {
         NavigationStack {
-            
-            
             ScrollView {
                 VStack(spacing: 20) {
                     ForEach(arcs, id: \.id) { currentArc in
@@ -37,6 +35,8 @@ struct ContentView: View {
             }
             
         }
+        
+        
     }
     
     func getAllArcsFromCsv() {
