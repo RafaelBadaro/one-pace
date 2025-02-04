@@ -43,18 +43,19 @@ struct ArcView: View {
                             }
                         }
                     }
-                    .navigationTitle(viewModel.arc.name)
-                    .onAppear {
-                        if viewModel.arc.episodes.isEmpty {
-                            Task {
-                                await viewModel.fetchEpisodes()
-                            }
-                        } else {
-                            print("Já fiz o fetch")
-                        }
-                    }
                 }
             }
+            .navigationTitle(viewModel.arc.name)
+            .onAppear {
+                    if viewModel.arc.episodes.isEmpty {
+                        Task {
+                            await viewModel.fetchEpisodes()
+                        }
+                    } else {
+                        print("Já fiz o fetch")
+                    }
+                }
+            
         }
     }
 }
