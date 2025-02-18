@@ -6,9 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ArcView: View {
     @ObservedObject private var viewModel: ArcViewModel
+    
+    @Query private var episodes: [Episode]
+
     
     init(viewModel: ArcViewModel) {
         self.viewModel = viewModel
@@ -26,7 +30,7 @@ struct ArcView: View {
                         .padding()
                 } else {
                     ScrollView {
-                        ForEach(viewModel.arc.episodes, id: \.id) { currentEpisode in
+                        ForEach(episodes, id: \.id) { currentEpisode in
                             NavigationLink(destination:
                                             EpisodeView(viewModel: EpisodeViewModel(episode: currentEpisode))) {
                                 
@@ -47,7 +51,7 @@ struct ArcView: View {
             }
             .navigationTitle(viewModel.arc.name)
             .onAppear {
-                    if viewModel.arc.episodes.isEmpty {
+                    if episodes.isEmpty {
                         Task {
                             await viewModel.fetchEpisodes()
                         }

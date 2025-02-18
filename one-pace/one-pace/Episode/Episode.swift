@@ -9,51 +9,56 @@ import Foundation
 import SwiftData
 
 @Model
-final class Episode  {
-    /**
-        Exemplo de URL com o Whole cake island
-     
-     EP 1
-     https://pixeldrain.com/l/5pVTECas#item=0
-     
-     url = https://pixeldrain.com
-     local = /l -> isso é um L
-     id = /5pVTECas
-     selector = #item=0
-     
-     EP 2
-     
-     https://pixeldrain.com/l/5pVTECas#item=1
-     
-     url = https://pixeldrain.com
-     local = /l -> isso é um L
-     id = /5pVTECas
-     selector = #item=1
-     
-     O id é o mesmo, o que muda é o o item selecionado. Ou seja o id é um ID do ARCO
-     porém eu sei que é possivel acessar de alguma maneira o video por si só, TODO: ver como
-     
-     O id do episodo seguindo essa logica é "5pVTECas#item=1" que representa basicamente arco/episodio
-     
-     LEMBRETE: SEMPRE É UM A MAIS (+1), POIS COMECA NO EP 1, MAS PROGRAMACAO E ETC FAZ COM QUE COMECE NO 0
-     
-     */
+final class Episode {
+
+    @Attribute(.unique) var id: String
+    var pixelDrainName: String
+    var url: String
     
-    var episodePixelDrainID: String // O valor na query
-    var title: String
-    var descriptionOfEpisode: String?
-    var image: String?
+    var onePaceEpisodeName: String
+    var onePieceEpisodes: String
     
-    init(episodePixelDrainID: String, title: String, description: String? = nil, image: String? = nil) {
-        self.episodePixelDrainID = episodePixelDrainID
-        self.title = title
-        self.descriptionOfEpisode = description
-        self.image = image
+    var createdAt: Date
+    
+    init(id: String, pixelDrainName: String, url: String) {
+        self.id = id
+        self.pixelDrainName = pixelDrainName
+        self.url = url
+        self.onePaceEpisodeName = Self.getOnePaceEpisodeName(pixelDrainName)
+        self.onePieceEpisodes = Self.getOnePieceEpisodes(pixelDrainName)
+        self.createdAt = Date()
     }
-    
-    
-    func fetchEpisodeData(){
         
+    private static func getOnePaceEpisodeName(_ pixelDrainName: String) -> String {
+        let regex = try! NSRegularExpression(pattern: "\\[([0-9]+-[0-9]+|[0-9]+)] ([A-Za-z ]+ [0-9]+)", options: [])
+        
+        // Busca pela expressão regular
+        if let match = regex.firstMatch(in: pixelDrainName, options: [], range: NSRange(location: 0, length: pixelDrainName.utf16.count)) {
+            let onePaceEpisodeRange = match.range(at: 2)    // Captura o segundo grupo (nome do episódio)
+            
+            if let onePaceEpisode = Range(onePaceEpisodeRange, in: pixelDrainName) {
+                let episodeName = pixelDrainName[onePaceEpisode]  // Ex: "Wano 01"
+                return String(episodeName) // Retorna o nome do episódio
+            }
+        }
+        
+        return "" // Caso não encontre, retorna uma string vazia
+    }
+
+    private static func getOnePieceEpisodes(_ pixelDrainName: String) -> String {
+        let regex = try! NSRegularExpression(pattern: "\\[([0-9]+-[0-9]+|[0-9]+)]", options: [])
+        
+        // Busca pela expressão regular
+        if let match = regex.firstMatch(in: pixelDrainName, options: [], range: NSRange(location: 0, length: pixelDrainName.utf16.count)) {
+            let onePieceEpisodesRange = match.range(at: 1)  // Captura o primeiro grupo (episódios)
+            
+            if let onePieceEpisodes = Range(onePieceEpisodesRange, in: pixelDrainName) {
+                let episodes = pixelDrainName[onePieceEpisodes]  // Ex: "909-910"
+                return String(episodes)
+            }
+        }
+        
+        return "" // Caso não encontre, retorna uma string vazia
     }
     
 }

@@ -10,6 +10,7 @@ import SwiftUICore
 
 @MainActor
 class ArcViewModel : ObservableObject {
+    @Environment(\.modelContext) private var modelContext
     private let api = PixelDrainAPI()
     @Published var arc: Arc
     @Published var isLoading: Bool = false
@@ -26,14 +27,20 @@ class ArcViewModel : ObservableObject {
         do {
             let response = try await api.fetchVideosFromList(from: self.arc.id)
             let episodes = response.files.map { pixelDrainVideo in
-                return EpisodeTest(
+                let episode = Episode(
                     id: pixelDrainVideo.id,
                     pixelDrainName: pixelDrainVideo.name,
                     url: "https://pixeldrain.com/api/file/\(pixelDrainVideo.id)"
                 )
+                
+                // Salvar no SwiftData
+                modelContext.insert(episode)
+                
+                return episode
             }
             self.arc.pixelDrainTitle = response.title
-            self.arc.episodes = episodes
+            //self.arc.episodes = episodes
+            //self.episodes = episodes
             self.isLoading = false
         } catch {
             self.errorMessage = error.localizedDescription

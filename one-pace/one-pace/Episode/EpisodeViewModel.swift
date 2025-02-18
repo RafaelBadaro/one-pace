@@ -9,11 +9,11 @@ import Foundation
 
 class EpisodeViewModel : ObservableObject {
     private let api = PixelDrainAPI()
-    @Published var episode: EpisodeTest
+    @Published var episode: Episode
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
  
-    init(episode: EpisodeTest) {
+    init(episode: Episode) {
         self.episode = episode
     }
     

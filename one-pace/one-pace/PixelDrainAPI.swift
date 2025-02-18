@@ -17,6 +17,11 @@ struct PixelDrainListResponse: Decodable {
     let files: [PixelDrainVideo]
 }
 
+enum PixelDrainError: Error {
+    case invalidURL
+    case noData
+}
+
 class PixelDrainAPI {
     func fetchVideosFromList(from listID: String) async throws -> PixelDrainListResponse {
         let urlString = "https://pixeldrain.com/api/list/\(listID)"
@@ -44,10 +49,5 @@ class PixelDrainAPI {
         let (data, _) = try await URLSession.shared.data(from: url)
         let videoResponse = try JSONDecoder().decode(PixelDrainVideo.self, from: data)
         return videoResponse
-    }
-    
-    enum PixelDrainError: Error {
-        case invalidURL
-        case noData
     }
 }
