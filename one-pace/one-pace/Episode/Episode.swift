@@ -14,16 +14,18 @@ final class Episode {
     @Attribute(.unique) var id: String
     var pixelDrainName: String
     var url: String
+    var arcID: String
     
     var onePaceEpisodeName: String
     var onePieceEpisodes: String
     
     var createdAt: Date
     
-    init(id: String, pixelDrainName: String, url: String) {
+    init(id: String, pixelDrainName: String, url: String, arcID: String) {
         self.id = id
         self.pixelDrainName = pixelDrainName
         self.url = url
+        self.arcID = arcID
         self.onePaceEpisodeName = Self.getOnePaceEpisodeName(pixelDrainName)
         self.onePieceEpisodes = Self.getOnePieceEpisodes(pixelDrainName)
         self.createdAt = Date()

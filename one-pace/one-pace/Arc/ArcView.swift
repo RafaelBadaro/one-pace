@@ -9,28 +9,26 @@ import SwiftUI
 import SwiftData
 
 struct ArcView: View {
+    @Environment(\.modelContext) private var modelContext
     @ObservedObject private var viewModel: ArcViewModel
     
-    @Query private var episodes: [Episode]
-
-    
-    init(viewModel: ArcViewModel) {
-        self.viewModel = viewModel
+    init(arc: Arc) {
+        self.viewModel = ArcViewModel(arc: arc)
     }
     
     var body: some View {
         NavigationStack {
             VStack {
-                if viewModel.isLoading {
+                if self.viewModel.isLoading {
                     ProgressView("Carregando vídeos...")
                         .padding()
-                } else if let errorMessage = viewModel.errorMessage {
+                } else if let errorMessage = self.viewModel.errorMessage {
                     Text("Erro: \(errorMessage)")
                         .foregroundColor(.red)
                         .padding()
                 } else {
                     ScrollView {
-                        ForEach(episodes, id: \.id) { currentEpisode in
+                        ForEach(self.viewModel.arc.episodes, id: \.id) { currentEpisode in
                             NavigationLink(destination:
                                             EpisodeView(viewModel: EpisodeViewModel(episode: currentEpisode))) {
                                 
@@ -49,17 +47,64 @@ struct ArcView: View {
                     }
                 }
             }
-            .navigationTitle(viewModel.arc.name)
+            .navigationTitle(self.viewModel.arc.name)
             .onAppear {
-                    if episodes.isEmpty {
-                        Task {
-                            await viewModel.fetchEpisodes()
-                        }
-                    } else {
-                        print("Já fiz o fetch")
+                if self.viewModel.arc.episodes.isEmpty {
+                    Task {
+                        self.viewModel.arc.episodes = await fetchEpisodes()
                     }
+                } else {
+                    print("Já fiz o fetch")
                 }
+            }
+        }
+    }
+    
+    func fetchEpisodes() async -> [Episode] {
+        viewModel.isLoading = true
+        viewModel.errorMessage = nil
+        
+        if let espisodesFromDB = fetchEpisodesFromDB(), !espisodesFromDB.isEmpty {
+            print("Fiz o fetch pelo DB")
+            viewModel.isLoading = false
+
+            return espisodesFromDB
+        }
+        
+        if let episodesFromAPI = await viewModel.fetchEpisodesFromAPI() {
             
+            //Salva no DB
+            episodesFromAPI.forEach { episode in
+                modelContext.insert(episode)
+            }
+            viewModel.isLoading = false
+            print("Fiz o fetch pela API")
+            return episodesFromAPI
+        }
+        
+        // Tratar aqui de maneira correta
+        return []
+    }
+    
+    func fetchEpisodesFromDB() -> [Episode]? {
+        //Tenta buscar no banco
+        
+        let arcID = self.viewModel.arc.id
+        
+        let descriptor = FetchDescriptor<Episode>(
+            predicate: #Predicate<Episode> { episode in
+                episode.arcID == arcID
+            },
+            sortBy: [SortDescriptor(\.onePaceEpisodeName)]
+        )
+        
+        do {
+            let episodes = try modelContext.fetch(descriptor)
+            return episodes
+        } catch {
+            print("Erro ao buscar episódios do banco: \(error)")
+            self.viewModel.errorMessage = error.localizedDescription
+            return nil
         }
     }
 }
