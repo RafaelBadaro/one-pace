@@ -21,9 +21,6 @@ class ArcViewModel : ObservableObject {
     }
     
     func fetchEpisodesFromAPI() async -> [Episode]? {
-//        isLoading = true
-//        errorMessage = nil
-        
         do {
             let response = try await api.fetchVideosFromList(from: self.arc.id)
             let episodes = response.files.map { pixelDrainVideo in
@@ -35,11 +32,10 @@ class ArcViewModel : ObservableObject {
                 )
                 return episode
             }
-            //self.isLoading = false
+            
             return episodes
         } catch {
             self.errorMessage = error.localizedDescription
-           // self.isLoading = false
             return nil
         }
     }

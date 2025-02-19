@@ -16,6 +16,7 @@ final class Episode {
     var url: String
     var arcID: String
     
+    var hasBeenWatched: Bool = false
     var onePaceEpisodeName: String
     var onePieceEpisodes: String
     
@@ -26,6 +27,7 @@ final class Episode {
         self.pixelDrainName = pixelDrainName
         self.url = url
         self.arcID = arcID
+        self.hasBeenWatched = false
         self.onePaceEpisodeName = Self.getOnePaceEpisodeName(pixelDrainName)
         self.onePieceEpisodes = Self.getOnePieceEpisodes(pixelDrainName)
         self.createdAt = Date()
