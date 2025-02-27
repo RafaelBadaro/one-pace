@@ -19,7 +19,7 @@ struct ContentView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     ForEach(arcs, id: \.id) { currentArc in
-                        NavigationLink(destination: ArcView(viewModel: ArcViewModel(arc: currentArc))) {
+                        NavigationLink(destination: ArcView(arc: currentArc)) {
                             ArcCardView(arcName: currentArc.name)
                         }
                     }

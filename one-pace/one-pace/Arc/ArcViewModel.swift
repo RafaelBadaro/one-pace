@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUICore
+import SwiftData
 
 @MainActor
 class ArcViewModel : ObservableObject {
@@ -19,25 +20,23 @@ class ArcViewModel : ObservableObject {
         self.arc = arc
     }
     
-    func fetchEpisodes() async {
-        isLoading = true
-        errorMessage = nil
-
+    func fetchEpisodesFromAPI() async -> [Episode]? {
         do {
             let response = try await api.fetchVideosFromList(from: self.arc.id)
             let episodes = response.files.map { pixelDrainVideo in
-                return EpisodeTest(
+                let episode = Episode(
                     id: pixelDrainVideo.id,
                     pixelDrainName: pixelDrainVideo.name,
-                    url: "https://pixeldrain.com/api/file/\(pixelDrainVideo.id)"
+                    url: "https://pixeldrain.com/api/file/\(pixelDrainVideo.id)",
+                    arcID: self.arc.id
                 )
+                return episode
             }
-            self.arc.pixelDrainTitle = response.title
-            self.arc.episodes = episodes
-            self.isLoading = false
+            
+            return episodes
         } catch {
             self.errorMessage = error.localizedDescription
-            self.isLoading = false
+            return nil
         }
     }
 }
