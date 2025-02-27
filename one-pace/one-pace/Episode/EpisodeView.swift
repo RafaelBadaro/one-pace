@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVKit
+import AVFoundation
 
 struct EpisodeView: View {
     @ObservedObject private var viewModel: EpisodeViewModel
@@ -46,6 +47,14 @@ struct VideoPlayerView: UIViewControllerRepresentable {
         playerViewController.showsPlaybackControls = true // Controles de reprodução
         player.automaticallyWaitsToMinimizeStalling = true // Reduz travamentos
         player.volume = 1.0 // Garante que o som está no máximo
+        
+        // Configura o AVAudioSession para permitir reprodução no modo silencioso
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Erro ao configurar AVAudioSession: \(error.localizedDescription)")
+        }
         
         return playerViewController
     }
