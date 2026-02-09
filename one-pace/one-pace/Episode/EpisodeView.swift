@@ -56,11 +56,26 @@ struct VideoPlayerView: UIViewControllerRepresentable {
             print("Erro ao configurar AVAudioSession: \(error.localizedDescription)")
         }
         
+        player.play()
+        playerViewController.entersFullScreenWhenPlaybackBegins = true
+        playerViewController.exitsFullScreenWhenPlaybackEnds = true
+        
+        UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+
+        UIViewController.attemptRotationToDeviceOrientation() // Notifica o sistema para atualizar a orientação
+        
         return playerViewController
     }
     
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
         // Atualize se necessário
+    }
+}
+
+// Extensão para forçar a orientação landscape
+extension UINavigationController {
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .landscape
     }
 }
 

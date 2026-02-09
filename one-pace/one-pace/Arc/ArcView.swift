@@ -77,11 +77,11 @@ struct ArcView: View {
         viewModel.isLoading = true
         viewModel.errorMessage = nil
         
-        if let espisodesFromDB = fetchEpisodesFromDB(),
-            !espisodesFromDB.isEmpty {
+        if let episodesFromDB = fetchEpisodesFromDB(),
+            !episodesFromDB.isEmpty {
             viewModel.isLoading = false
             print("Fiz o fetch pelo DB")
-            return espisodesFromDB
+            return episodesFromDB
         }
         
         if let episodesFromAPI = await viewModel.fetchEpisodesFromAPI() {

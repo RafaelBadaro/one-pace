@@ -46,6 +46,7 @@ struct ContentView: View {
                 
                 for i in 1..<listOfIdAndArcNames.count {
                     let idAndName = listOfIdAndArcNames[i].components(separatedBy: ",")
+                    guard idAndName.count >= 2 else { continue }
                     let id = idAndName[0]
                     let name = idAndName[1].replacingOccurrences(of: "\r", with: "")
                     arcs.append(Arc(id: id, name: name))
