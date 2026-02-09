@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVKit
+import AVFoundation
 
 struct EpisodeView: View {
     @ObservedObject private var viewModel: EpisodeViewModel
@@ -47,11 +48,34 @@ struct VideoPlayerView: UIViewControllerRepresentable {
         player.automaticallyWaitsToMinimizeStalling = true // Reduz travamentos
         player.volume = 1.0 // Garante que o som está no máximo
         
+        // Configura o AVAudioSession para permitir reprodução no modo silencioso
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Erro ao configurar AVAudioSession: \(error.localizedDescription)")
+        }
+        
+        player.play()
+        playerViewController.entersFullScreenWhenPlaybackBegins = true
+        playerViewController.exitsFullScreenWhenPlaybackEnds = true
+        
+        UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+
+        UIViewController.attemptRotationToDeviceOrientation() // Notifica o sistema para atualizar a orientação
+        
         return playerViewController
     }
     
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
         // Atualize se necessário
+    }
+}
+
+// Extensão para forçar a orientação landscape
+extension UINavigationController {
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .landscape
     }
 }
 
